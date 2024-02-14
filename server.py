@@ -1,7 +1,7 @@
 import socket
 from dnslib import DNSRecord
 import base64
-
+import sys
 
 
 def parse_dns_response(data):
@@ -14,7 +14,9 @@ if __name__ == '__main__':
     received_data = ""
 
     port = 53
-    ip = '127.0.0.1'
+    ip = sys.argv[1]
+
+    print(f"Server running on {ip}:{port}")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((ip, port))
