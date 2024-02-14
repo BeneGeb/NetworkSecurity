@@ -1,5 +1,5 @@
-import socket, glob, json, struct
-from dnslib import DNSRecord, DNSHeader, QTYPE, RR, A
+import socket
+from dnslib import DNSRecord
 import base64
 
 
@@ -9,8 +9,6 @@ def parse_dns_response(data):
     domain = str(dns_request.q.qname).rstrip('.')
 
     return domain
-   
-    
 
 if __name__ == '__main__':
     received_data = ""
