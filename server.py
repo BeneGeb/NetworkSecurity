@@ -101,11 +101,3 @@ if __name__ == '__main__':
         addr, incoming_port = interface
     
         handle_dns_request(data, addr, incoming_port)
-
-        
-
-        # if r[-1] == "=":
-        #     received_bytes = received_data.encode('utf-8')
-        #     b64decoded = base64.b64decode(received_bytes)
-        #     print(b64decoded.decode('utf-8'))
-    
