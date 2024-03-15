@@ -36,8 +36,3 @@ Eine mögliche Gegenmaßnahme ist das Begrenzen von DNS Requests, bzw. Erkennen 
 ### Whitelisting von vertrauenswürdigen DNS Servern
 In einem Netzwerk ist es sinnvoll eine Whitelist für vertrauenswürdige DNS Server anzulegen. In unserem Szenario würde der von uns entwickelte Server logischerweise nicht auf der Whitelist stehen. 
 Dies ermöglicht es, DNS-Antworten, die von diesem Server stammen, sowie DNS-Anfragen, die an ihn gesendet werden, als verdächtig zu betrachten und zu blocken.
-
-### Einsatz von DNSSEC(DNS Security Extension)
-DNSSEC (Domain Name System Security Extensions) ist eine Sicherheitstechnologie, die entwickelt wurde, um die Integrität und Authentizität von DNS-Daten zu gewährleisten. Durch die Verwendung digitaler Signaturen ermöglicht DNSSEC die Überprüfung der Echtheit von DNS-Antworten. In einem Netzwerk könnten anschließend alle DNS Antworten auf Integrität und Authentizität überprüft werden. Sobald eine DNS Antwort diese Anforderung nicht erfüllt, wäre das ein Indiz für die Extraktion von Daten über DNS. Anschließend könnten solche Anfragen geblockt werden.
- 
-
