@@ -6,8 +6,8 @@ import hashlib
 
 read_files = {}
 
-port = 53
-ip = "192.168.60.128"
+port = 52
+ip = "0.0.0.0"
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
@@ -84,17 +84,12 @@ def send_dns_response(addr, port, data):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         sock.sendto(response_bytes, (addr, port))
 
+
     
 
 if __name__ == '__main__':
-    received_data = ""
-
-    port = 53
-    ip = "192.168.60.128"
-
     print(f"Server running on {ip}:{port}")
 
-   
 
     while True:
         data, interface = sock.recvfrom(512)
