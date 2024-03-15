@@ -6,8 +6,8 @@ import hashlib
 
 read_files = {}
 
-port = 52
-ip = "0.0.0.0"
+port = 53
+ip = "192.168.0.105"
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
@@ -45,7 +45,8 @@ def check_save_file(file_name):
         
         read_files[file_name] = (splitted_content, md5_hash)
 
-def handle_dns_request(data, addr, port):
+def handle_dns_request(data, addr):
+    print("received data")
     dns_request = dnslib.DNSRecord.parse(data)
     payload = str(dns_request.q.qname).rstrip('.')
 
@@ -55,21 +56,21 @@ def handle_dns_request(data, addr, port):
     check_save_file(file_name)
 
     if len(splitted_payload) == 2:
-        send_dns_response(addr, port, len(read_files[file_name][0]))
+        send_dns_response(addr,  len(read_files[file_name][0]))
         return
   
     fragment = splitted_payload[0]
 
     if int(fragment) == len(read_files[file_name][0]) + 1:
 
-        send_dns_response(addr, port, read_files[file_name][1])
+        send_dns_response(addr, read_files[file_name][1])
         return 
     
-    send_dns_response(addr, port, read_files[file_name][0][int(fragment)])
+    send_dns_response(addr, read_files[file_name][0][int(fragment)])
 
 
 
-def send_dns_response(addr, port, data):
+def send_dns_response(addr, data):
     response = dnslib.DNSRecord()
     response.header.rcode = dnslib.RCODE.NOERROR
     response.add_answer(dnslib.RR(
@@ -80,19 +81,23 @@ def send_dns_response(addr, port, data):
     ))
     response_bytes = response.pack()
 
-
+    print(response)
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         sock.sendto(response_bytes, (addr, port))
-
 
     
 
 if __name__ == '__main__':
+
     print(f"Server running on {ip}:{port}")
 
+   
 
     while True:
         data, interface = sock.recvfrom(512)
         addr, incoming_port = interface
-    
-        handle_dns_request(data, addr, incoming_port)
+        print(incoming_port)
+        
+        handle_dns_request(data, addr)
+ 
+        #send_dns_response("192.168.0.103", 53, "aaaaa")

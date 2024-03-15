@@ -4,12 +4,13 @@ import socket
 import sys
 import hashlib
 
-def send_dns_query(data, server_ip, server_port=53):
+def send_dns_query(data, server_ip):
     dns_request = dnslib.DNSRecord.question(data)
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.bind(('127.0.0.1', 53))
         sock.settimeout(5) 
-        sock.sendto(dns_request.pack(), (server_ip, server_port))
+        sock.sendto(dns_request.pack(), (server_ip, 53))
   
         try:
             data, _ = sock.recvfrom(1024)
